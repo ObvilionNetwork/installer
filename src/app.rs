@@ -53,6 +53,7 @@ impl Sandbox for App {
                         .push(Row::new()
                             .push(Button::new(install_button, Text::new("Установить"))
                                 .style(InstallationButtonStyle)
+                                .padding([10, 40])
                                 .on_press(Message::BeginInstall))
                             .push(Button::new(settings_button, svg::Svg::new(svg::Handle::from_path("assets/settings.svg")))
                                 .on_press(Message::OpenSettings)
