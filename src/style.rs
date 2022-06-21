@@ -1,4 +1,6 @@
-use iced::{button, Vector, Color, Text, Font};
+use iced::{button, Vector, Color, Text};
+
+use crate::assets;
 
 const MAIN_COLOR: Color = Color { r: 73.0 / 255.0, g: 159.0 / 255.0, b: 251.0 / 255.0, a: 1.0 };
 const GRAY_COLOR: Color = Color { r: 183.0 / 255.0, g: 183.0 / 255.0, b: 183.0 / 255.0, a: 1.0 };
@@ -64,6 +66,6 @@ impl TextStyles for Text {
         self
             .color(GRAY_COLOR)
             .size(24)
-            .font(Font::External { name: "Noto Sans Light", bytes: include_bytes!("../assets/noto-sans-light.ttf") })
+            .font(assets::NOTO_LIGHT)
     }
 }

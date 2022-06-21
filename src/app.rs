@@ -1,5 +1,11 @@
-use iced::{button, svg, Button, Color, Column, Container, Element, Image, Length, Row, Sandbox, Text, Space};
+use iced::image::Handle as ImageHandle;
+use iced::svg::Handle as SvgHandle;
+use iced::{
+    button, Alignment, Button, Color, Column, Container, Element, Image, Length, Row, Sandbox, Space, Svg,
+    Text,
+};
 
+use crate::assets;
 use crate::style::{InstallationButtonStyle, SettingsButtonStyle, TextStyles};
 
 pub struct App {
@@ -39,27 +45,26 @@ impl Sandbox for App {
     fn view(&mut self) -> Element<Message> {
         let content = match &mut self.screen {
             Screen::Greeting { install_button, settings_button } => Row::new()
-                .push(Container::new(Image::new("assets/logo.png")
-                        .width(Length::Units(166))
-                        .height(Length::Units(166)))
-                    .width(Length::Units(166 + 70))
-                    .height(Length::Fill)
-                    .center_y())
-                .push(Container::new(Column::new()
-                        .push(Text::new("Установка среды запуска Obvilion Network").style_heading())
-                        .push(Space::new(Length::Units(0), Length::Units(20)))
-                        .push(Text::new("Этот мастер установки поможет Вам установить ПО для правильной работы Obvilion Launcher").style_description())
-                        .push(Space::new(Length::Units(0), Length::Units(35)))
-                        .push(Row::new()
-                            .push(Button::new(install_button, Text::new("Установить"))
-                                .style(InstallationButtonStyle)
-                                .padding([10, 40])
-                                .on_press(Message::BeginInstall))
-                            .push(Button::new(settings_button, svg::Svg::new(svg::Handle::from_path("assets/settings.svg")))
-                                .on_press(Message::OpenSettings)
-                                .style(SettingsButtonStyle))))
-                    .height(Length::Fill)
-                    .center_y()),
+                .align_items(Alignment::Center)
+                .spacing(70)
+                .push(Image::new(ImageHandle::from_memory(assets::LOGO_PNG.to_vec()))
+                    .width(Length::Units(166))
+                    .height(Length::Units(166)))
+                .push(Column::new()
+                    .push(Text::new("Установка среды запуска Obvilion Network").style_heading())
+                    .push(Space::new(Length::Units(0), Length::Units(20)))
+                    .push(Text::new("Этот мастер установки поможет Вам установить ПО для правильной работы Obvilion Launcher").style_description())
+                    .push(Space::new(Length::Units(0), Length::Units(35)))
+                    .push(Row::new()
+                        .align_items(Alignment::Center)
+                        .push(Button::new(install_button, Text::new("Установить"))
+                            .style(InstallationButtonStyle)
+                            .padding([9, 33])
+                            .on_press(Message::BeginInstall))
+                        .push(Space::new(Length::Units(5), Length::Units(0)))
+                        .push(Button::new(settings_button, Svg::new(SvgHandle::from_memory(assets::SETTINGS_SVG)))
+                            .on_press(Message::OpenSettings)
+                            .style(SettingsButtonStyle)))),
             _ => todo!(),
         };
 
