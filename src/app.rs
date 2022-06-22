@@ -18,10 +18,7 @@ impl Sandbox for App {
 
     fn new() -> Self {
         App {
-            screen: Screen::Greeting {
-                install_button: button::State::default(),
-                settings_button: button::State::default(),
-            },
+            screen: Screen::greeting(),
             exit: false,
         }
     }
@@ -39,7 +36,12 @@ impl Sandbox for App {
     }
 
     fn update(&mut self, message: Message) {
-        println!("{message:?}");
+        self.screen = match message {
+            Message::BeginInstall => Screen::Installation,
+            Message::CancelInstall => Screen::greeting(),
+            Message::OpenSettings => Screen::Settings,
+            Message::CloseSettings => Screen::greeting(),
+        }
     }
 
     fn view(&mut self) -> Element<Message> {
@@ -94,4 +96,25 @@ enum Screen {
     Settings,
     Installation,
     Finish,
+}
+
+impl Screen {
+    fn greeting() -> Self {
+        Self::Greeting {
+            install_button: button::State::default(),
+            settings_button: button::State::default()
+        }
+    }
+
+    fn settings() -> Self {
+        Self::Settings
+    }
+
+    fn installation() -> Self {
+        Self::Installation
+    }
+
+    fn finish() -> Self {
+        Self::Finish
+    }
 }
