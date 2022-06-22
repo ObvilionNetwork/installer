@@ -45,7 +45,7 @@ impl Sandbox for App {
     }
 
     fn view(&mut self) -> Element<Message> {
-        let content = match &mut self.screen {
+        let content: Element<Message> = match &mut self.screen {
             Screen::Greeting { install_button, settings_button } => Row::new()
                 .align_items(Alignment::Center)
                 .spacing(70)
@@ -66,8 +66,16 @@ impl Sandbox for App {
                         .push(Space::new(Length::Units(5), Length::Units(0)))
                         .push(Button::new(settings_button, Svg::new(SvgHandle::from_memory(assets::SETTINGS_SVG)))
                             .on_press(Message::OpenSettings)
-                            .style(SettingsButtonStyle)))),
-            _ => todo!(),
+                            .style(SettingsButtonStyle)))).into(),
+            Screen::Settings => {
+                Text::new("Settings").style_heading().into()
+            },
+            Screen::Installation => {
+                Text::new("Installation...").style_heading().into()
+            }
+            Screen::Finish => {
+                Text::new("Installation completed").style_heading().into()
+            }
         };
 
         Container::new(content)
