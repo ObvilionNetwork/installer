@@ -1,25 +1,37 @@
-use iced::image::Handle as ImageHandle;
-use iced::svg::Handle as SvgHandle;
-use iced::{
-    button, Alignment, Button, Color, Column, Container, Element, Image, Length, Row, Sandbox, Space, Svg,
-    Text,
-};
+use iced::{Color, Element, Sandbox};
 
-use crate::assets;
-use crate::style::{AccentButtonStyle, ImageButtonStyle, TextStyles};
+use crate::screen::*;
+use crate::installer::default_installation_directory;
 
 pub struct App {
-    screen: Screen,
-    exit: bool,
+    pub screen: Screen,
+    pub context: Context,
 }
 
 impl Sandbox for App {
     type Message = Message;
 
     fn new() -> Self {
+        let install_for_all_users = cfg!(windows);
+        let mut manual_path_selection = false;
+        let installation_path = match default_installation_directory(install_for_all_users) {
+            Some(path) => path,
+            None => {
+                manual_path_selection = true;
+                String::new()
+            }
+        };
+
         App {
             screen: Screen::greeting(),
-            exit: false,
+            context: Context {
+                exit: false,
+                create_shortcut: true,
+                install_for_all_users,
+                manual_path_selection,
+                installation_path,
+                start_launcher: true
+            },
         }
     }
 
@@ -32,97 +44,60 @@ impl Sandbox for App {
     }
 
     fn should_exit(&self) -> bool {
-        self.exit
+        self.context.exit
     }
 
     fn update(&mut self, message: Message) {
-        self.screen = match message {
-            Message::BeginInstall => Screen::Installation,
-            Message::CancelInstall => Screen::greeting(),
-            Message::OpenSettings => Screen::Settings,
-            Message::CloseSettings => Screen::greeting(),
+        match message {
+            Message::UpdateScreen(screen) => {
+                self.screen = screen
+            },
+            Message::UpdateCreateShortcut(create_shortcut) => {
+                self.context.create_shortcut = create_shortcut
+            },
+            Message::UpdateInstallForAllUsers(install_for_all_users) => {
+                self.context.install_for_all_users = install_for_all_users
+            },
+            Message::UpdateManualPathSelection(manual_path_selection) => {
+                self.context.manual_path_selection = manual_path_selection;
+            },
+            Message::UpdateInstallationPath(path) => {
+                self.context.installation_path = path;
+            },
+            Message::UpdateStartLauncher(start_launcher) => {
+                self.context.start_launcher = start_launcher;
+            },
+            Message::Exit => {
+                if self.context.start_launcher {
+                    // TODO: actually start
+                    println!("Starting launcher");
+                }
+                self.context.exit = true;
+            }
         }
     }
 
     fn view(&mut self) -> Element<Message> {
-        let content: Element<Message> = match &mut self.screen {
-            Screen::Greeting { install_button, settings_button } => Row::new()
-                .align_items(Alignment::Center)
-                .spacing(70)
-                .push(Image::new(ImageHandle::from_memory(assets::LOGO_PNG.to_vec()))
-                    .width(Length::Units(166))
-                    .height(Length::Units(166)))
-                .push(Column::new()
-                    .push(Text::new("Установка среды запуска Obvilion Network").style_heading())
-                    .push(Space::new(Length::Units(0), Length::Units(20)))
-                    .push(Text::new("Этот мастер установки поможет Вам установить ПО для правильной работы Obvilion Launcher").style_description())
-                    .push(Space::new(Length::Units(0), Length::Units(35)))
-                    .push(Row::new()
-                        .align_items(Alignment::Center)
-                        .push(Button::new(install_button, Text::new("Установить"))
-                            .style(AccentButtonStyle::Default)
-                            .padding([9, 33])
-                            .on_press(Message::BeginInstall))
-                        .push(Space::new(Length::Units(5), Length::Units(0)))
-                        .push(Button::new(settings_button, Svg::new(SvgHandle::from_memory(assets::SETTINGS_SVG)))
-                            .on_press(Message::OpenSettings)
-                            .style(ImageButtonStyle)))).into(),
-            Screen::Settings => {
-                Text::new("Settings").style_heading().into()
-            },
-            Screen::Installation => {
-                Text::new("Installation...").style_heading().into()
-            }
-            Screen::Finish => {
-                Text::new("Installation completed").style_heading().into()
-            }
-        };
-
-        Container::new(content)
-            .padding([0, 70])
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .center_x()
-            .center_y()
-            .into()
+        self.screen.show(&self.context)
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Message {
-    OpenSettings,
-    CloseSettings,
-    BeginInstall,
-    CancelInstall,
+    UpdateScreen(Screen),
+    UpdateCreateShortcut(bool),
+    UpdateInstallForAllUsers(bool),
+    UpdateManualPathSelection(bool),
+    UpdateInstallationPath(String),
+    UpdateStartLauncher(bool),
+    Exit
 }
 
-enum Screen {
-    Greeting {
-        install_button: button::State,
-        settings_button: button::State,
-    },
-    Settings,
-    Installation,
-    Finish,
-}
-
-impl Screen {
-    fn greeting() -> Self {
-        Self::Greeting {
-            install_button: button::State::default(),
-            settings_button: button::State::default()
-        }
-    }
-
-    fn settings() -> Self {
-        Self::Settings
-    }
-
-    fn installation() -> Self {
-        Self::Installation
-    }
-
-    fn finish() -> Self {
-        Self::Finish
-    }
+pub struct Context {
+    pub exit: bool,
+    pub create_shortcut: bool,
+    pub install_for_all_users: bool,
+    pub manual_path_selection: bool,
+    pub installation_path: String,
+    pub start_launcher: bool
 }

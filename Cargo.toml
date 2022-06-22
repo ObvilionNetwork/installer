@@ -14,6 +14,10 @@ codegen-units = 1
 panic = "abort"
 opt-level = "z"
 
+[dependencies]
+native-dialog = "0.6"
+dirs = "4.0"
+
 [dependencies.iced]
 version = "0.4"
 features = ["image", "svg"]
