@@ -6,6 +6,8 @@ use app::App;
 
 mod assets;
 
+mod colors;
+
 mod style;
 
 pub fn main() -> iced::Result {

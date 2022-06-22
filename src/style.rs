@@ -1,43 +1,55 @@
-use iced::{button, Vector, Color, Text};
+use iced::{button, Color, Text, Vector};
 
 use crate::assets;
+use crate::colors::*;
 
-const MAIN_COLOR: Color = Color { r: 73.0 / 255.0, g: 159.0 / 255.0, b: 251.0 / 255.0, a: 1.0 };
-const GRAY_COLOR: Color = Color { r: 183.0 / 255.0, g: 183.0 / 255.0, b: 183.0 / 255.0, a: 1.0 };
-const LIGHT_COLOR: Color = Color { r: 200.0 / 255.0, g: 200.0 / 255.0, b: 200.0 / 255.0, a: 1.0 };
+pub enum AccentButtonStyle {
+    Default,
+    Destructive,
+}
 
-pub struct InstallationButtonStyle;
-
-impl button::StyleSheet for InstallationButtonStyle {
+impl button::StyleSheet for AccentButtonStyle {
     fn active(&self) -> button::Style {
         button::Style {
             shadow_offset: Vector::default(),
-            background: Color { a: 0.3, ..MAIN_COLOR }.into(),
+            background: match self {
+                Self::Default => ACCENT_TRANSPARENT.into(),
+                Self::Destructive => GRAY_TRANSPARENT.into(),
+            },
             border_radius: 9.0,
             border_width: 2.0,
-            border_color: MAIN_COLOR,
+            border_color: match self {
+                Self::Default => ACCENT_COLOR,
+                Self::Destructive => LIGHT_TRANSPARENT,
+            },
             text_color: Color::WHITE,
         }
     }
 
     fn hovered(&self) -> button::Style {
         button::Style {
-            border_color: LIGHT_COLOR,
+            border_color: match self {
+                Self::Default => LIGHT_COLOR,
+                Self::Destructive => DANGER_COLOR,
+            },
             ..self.active()
         }
     }
 
     fn pressed(&self) -> button::Style {
         button::Style {
-            background: Color { a: 0.2, ..GRAY_COLOR }.into(),
+            background: match self {
+                Self::Default => GRAY_TRANSPARENT.into(),
+                Self::Destructive => DANGER_TRANSPARENT.into(),
+            },
             ..self.hovered()
         }
     }
 }
 
-pub struct SettingsButtonStyle;
+pub struct ImageButtonStyle;
 
-impl button::StyleSheet for SettingsButtonStyle {
+impl button::StyleSheet for ImageButtonStyle {
     fn active(&self) -> button::Style {
         button::Style {
             shadow_offset: Vector::default(),
@@ -57,15 +69,10 @@ pub trait TextStyles {
 
 impl TextStyles for Text {
     fn style_heading(self) -> Text {
-        self
-            .color(Color::WHITE)
-            .size(48)
+        self.color(Color::WHITE).size(48)
     }
 
     fn style_description(self) -> Self {
-        self
-            .color(GRAY_COLOR)
-            .size(24)
-            .font(assets::NOTO_LIGHT)
+        self.color(GRAY_COLOR).size(24).font(assets::NOTO_LIGHT)
     }
 }

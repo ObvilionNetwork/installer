@@ -6,7 +6,7 @@ use iced::{
 };
 
 use crate::assets;
-use crate::style::{InstallationButtonStyle, SettingsButtonStyle, TextStyles};
+use crate::style::{AccentButtonStyle, ImageButtonStyle, TextStyles};
 
 pub struct App {
     screen: Screen,
@@ -60,13 +60,13 @@ impl Sandbox for App {
                     .push(Row::new()
                         .align_items(Alignment::Center)
                         .push(Button::new(install_button, Text::new("Установить"))
-                            .style(InstallationButtonStyle)
+                            .style(AccentButtonStyle::Default)
                             .padding([9, 33])
                             .on_press(Message::BeginInstall))
                         .push(Space::new(Length::Units(5), Length::Units(0)))
                         .push(Button::new(settings_button, Svg::new(SvgHandle::from_memory(assets::SETTINGS_SVG)))
                             .on_press(Message::OpenSettings)
-                            .style(SettingsButtonStyle)))).into(),
+                            .style(ImageButtonStyle)))).into(),
             Screen::Settings => {
                 Text::new("Settings").style_heading().into()
             },
